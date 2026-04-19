@@ -85,8 +85,9 @@ def init_db():
         cursor = db.cursor()
         
         if DATABASE_URL:
-            # PostgreSQL 初始化脚本
-            init_script = """
+            # PostgreSQL 初始化：由于包含复杂函数和触发器，不建议使用简单的分号拆分
+            # 我们将建表脚本和业务逻辑脚本作为两个整体分别执行
+            tables_script = """
             DROP TABLE IF EXISTS Orders CASCADE;
             DROP TABLE IF EXISTS Item CASCADE;
             DROP TABLE IF EXISTS AppUser CASCADE;
@@ -114,7 +115,10 @@ def init_db():
                 buyer_id TEXT NOT NULL REFERENCES AppUser(user_id),
                 order_date TEXT NOT NULL
             );
+            """
+            cursor.cursor.execute(tables_script)
 
+            logic_script = """
             -- PostgreSQL 触发器函数：更新状态
             CREATE OR REPLACE FUNCTION fn_update_item_status() RETURNS TRIGGER AS $$
             BEGIN
@@ -155,9 +159,7 @@ def init_db():
             BEFORE UPDATE OF status ON Item
             FOR EACH ROW EXECUTE FUNCTION fn_prevent_status_revert();
             """
-            for statement in init_script.split(';'):
-                if statement.strip():
-                    cursor.cursor.execute(statement)
+            cursor.cursor.execute(logic_script)
         else:
             # SQLite 初始化脚本 (保持原样)
             cursor.cursor.executescript("""
