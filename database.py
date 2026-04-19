@@ -155,7 +155,9 @@ def init_db():
             BEFORE UPDATE OF status ON Item
             FOR EACH ROW EXECUTE FUNCTION fn_prevent_status_revert();
             """
-            cursor.cursor.execute(init_script) # 直接使用原始 cursor 执行多条语句
+            for statement in init_script.split(';'):
+                if statement.strip():
+                    cursor.cursor.execute(statement)
         else:
             # SQLite 初始化脚本 (保持原样)
             cursor.cursor.executescript("""
