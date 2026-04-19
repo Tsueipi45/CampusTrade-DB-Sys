@@ -45,9 +45,12 @@ class CursorProxy:
             # 将 SQLite 的 ? 占位符替换为 PostgreSQL 的 %s
             sql = sql.replace("?", "%s")
             # 处理 SQLite 特有的 ROUND(AVG(price), 2)
-            # PostgreSQL 的 ROUND 需要明确转换类型：ROUND(CAST(AVG(price) AS numeric), 2)
             if "ROUND(AVG(price), 2)" in sql:
                 sql = sql.replace("ROUND(AVG(price), 2)", "ROUND(CAST(AVG(price) AS numeric), 2)")
+            # 处理 IFNULL -> COALESCE
+            if "IFNULL(" in sql:
+                sql = sql.replace("IFNULL(", "COALESCE(")
+            # 处理 SQLite 的 || 字符串拼接（PostgreSQL 也支持，但有时会有类型问题，不过这里应该还好）
         
         if params:
             return self.cursor.execute(sql, params)
@@ -86,9 +89,9 @@ def init_db():
             init_script = """
             DROP TABLE IF EXISTS Orders CASCADE;
             DROP TABLE IF EXISTS Item CASCADE;
-            DROP TABLE IF EXISTS "User" CASCADE;
+            DROP TABLE IF EXISTS AppUser CASCADE;
 
-            CREATE TABLE "User" (
+            CREATE TABLE AppUser (
                 user_id TEXT PRIMARY KEY,
                 user_name TEXT NOT NULL,
                 phone TEXT NOT NULL,
@@ -102,13 +105,13 @@ def init_db():
                 category TEXT NOT NULL,
                 price NUMERIC NOT NULL CHECK(price > 0),
                 status INTEGER NOT NULL CHECK(status IN (0, 1, 2)),
-                seller_id TEXT NOT NULL REFERENCES "User"(user_id)
+                seller_id TEXT NOT NULL REFERENCES AppUser(user_id)
             );
 
             CREATE TABLE Orders (
                 order_id TEXT PRIMARY KEY,
                 item_id TEXT NOT NULL UNIQUE REFERENCES Item(item_id),
-                buyer_id TEXT NOT NULL REFERENCES "User"(user_id),
+                buyer_id TEXT NOT NULL REFERENCES AppUser(user_id),
                 order_date TEXT NOT NULL
             );
 
@@ -158,9 +161,9 @@ def init_db():
             cursor.cursor.executescript("""
             DROP TABLE IF EXISTS Orders;
             DROP TABLE IF EXISTS Item;
-            DROP TABLE IF EXISTS User;
+            DROP TABLE IF EXISTS AppUser;
 
-            CREATE TABLE User (
+            CREATE TABLE AppUser (
                 user_id TEXT PRIMARY KEY,
                 user_name TEXT NOT NULL,
                 phone TEXT NOT NULL,
@@ -175,7 +178,7 @@ def init_db():
                 price REAL NOT NULL CHECK(price > 0),
                 status INTEGER NOT NULL CHECK(status IN (0, 1, 2)),
                 seller_id TEXT NOT NULL,
-                FOREIGN KEY (seller_id) REFERENCES User(user_id)
+                FOREIGN KEY (seller_id) REFERENCES AppUser(user_id)
             );
 
             CREATE TABLE Orders (
@@ -184,7 +187,7 @@ def init_db():
                 buyer_id TEXT NOT NULL,
                 order_date TEXT NOT NULL,
                 FOREIGN KEY (item_id) REFERENCES Item(item_id),
-                FOREIGN KEY (buyer_id) REFERENCES User(user_id)
+                FOREIGN KEY (buyer_id) REFERENCES AppUser(user_id)
             );
 
             CREATE TRIGGER IF NOT EXISTS update_item_status_after_order
@@ -219,10 +222,8 @@ def init_db():
             ("u003", "WangWu", "13800000003", generate_password_hash("user123"), "user"),
             ("u004", "ZhaoLiu", "13800000004", generate_password_hash("user123"), "user"),
         ]
-        # PostgreSQL 需要将 User 放在引号中，因为它可能被视为保留关键字
-        user_table = '"User"' if DATABASE_URL else "User"
         for user in users:
-            cursor.execute(f"INSERT INTO {user_table} VALUES (?, ?, ?, ?, ?)", user)
+            cursor.execute("INSERT INTO AppUser VALUES (?, ?, ?, ?, ?)", user)
 
         items = [
             ("1001", "CalculusBook", "图书影音", 20, 0, "u001"),

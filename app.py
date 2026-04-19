@@ -7,12 +7,11 @@ def create_app():
     # 自动初始化数据库逻辑
     should_init = False
     if DATABASE_URL:
-        # PostgreSQL: 检查 User 表是否存在
+        # PostgreSQL: 检查 AppUser 表是否存在
         try:
             with get_db() as db:
                 cursor = db.cursor()
-                user_table = '"User"'
-                cursor.execute(f"SELECT 1 FROM {user_table} LIMIT 1")
+                cursor.execute("SELECT 1 FROM AppUser LIMIT 1")
         except Exception:
             should_init = True
     else:

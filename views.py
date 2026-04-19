@@ -25,7 +25,7 @@ def fetch_user_by_id(user_id):
         return cursor.execute(
             """
             SELECT user_id, user_name, phone, password_hash, role
-            FROM User
+            FROM AppUser
             WHERE user_id = ?
             """,
             (user_id,),
@@ -38,7 +38,7 @@ def fetch_all_users():
         return cursor.execute(
             """
             SELECT user_id, user_name, phone, password_hash, role
-            FROM User
+            FROM AppUser
             ORDER BY user_id
             """
         ).fetchall()
@@ -185,7 +185,7 @@ def register_routes(app):
             with get_db() as conn:
                 cursor = conn.cursor()
                 exists = cursor.execute(
-                    "SELECT 1 FROM User WHERE user_id = ?", (user_id,)
+                    "SELECT 1 FROM AppUser WHERE user_id = ?", (user_id,)
                 ).fetchone()
                 if exists:
                     flash("该用户 ID 已存在，请更换后再试。")
@@ -193,7 +193,7 @@ def register_routes(app):
 
                 cursor.execute(
                     """
-                    INSERT INTO User (user_id, user_name, phone, password_hash, role)
+                    INSERT INTO AppUser (user_id, user_name, phone, password_hash, role)
                     VALUES (?, ?, ?, ?, 'user')
                     """,
                     (user_id, user_name, phone, generate_password_hash(password)),
@@ -372,7 +372,7 @@ def register_routes(app):
             unsold_items = [item for item in items if item[4] == 0]
             sold_items = [item for item in items if item[4] == 1]
             if profile[4] == "admin":
-                users = cursor.execute("SELECT * FROM User ORDER BY user_id").fetchall()
+                users = cursor.execute("SELECT * FROM AppUser ORDER BY user_id").fetchall()
                 orders = []
                 my_sold_items = []
                 order_section_title = ""
@@ -391,7 +391,7 @@ def register_routes(app):
                     SELECT i.item_id, i.item_name, i.price, o.order_date, u.user_name as buyer_name
                     FROM Item i
                     JOIN Orders o ON i.item_id = o.item_id
-                    JOIN User u ON o.buyer_id = u.user_id
+                    JOIN AppUser u ON o.buyer_id = u.user_id
                     WHERE i.seller_id = ? AND i.status = 1
                     ORDER BY o.order_date DESC
                     """,
@@ -420,12 +420,12 @@ def register_routes(app):
             cursor = conn.cursor()
             if search_query:
                 users = cursor.execute(
-                    "SELECT user_id, user_name, phone, role FROM User WHERE user_id LIKE ? OR user_name LIKE ? OR phone LIKE ? ORDER BY user_id",
+                    "SELECT user_id, user_name, phone, role FROM AppUser WHERE user_id LIKE ? OR user_name LIKE ? OR phone LIKE ? ORDER BY user_id",
                     (f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"),
                 ).fetchall()
             else:
                 users = cursor.execute(
-                    "SELECT user_id, user_name, phone, role FROM User ORDER BY user_id"
+                    "SELECT user_id, user_name, phone, role FROM AppUser ORDER BY user_id"
                 ).fetchall()
 
         return render_template(
@@ -620,8 +620,8 @@ def register_routes(app):
         with get_db() as conn:
             cursor = conn.cursor()
             # 仅获取角色为 'user' 的用户作为筛选选项
-            seller_options = cursor.execute("SELECT user_id, user_name FROM User WHERE role = 'user'").fetchall()
-            buyer_options = cursor.execute("SELECT user_id, user_name FROM User WHERE role = 'user'").fetchall()
+            seller_options = cursor.execute("SELECT user_id, user_name FROM AppUser WHERE role = 'user'").fetchall()
+            buyer_options = cursor.execute("SELECT user_id, user_name FROM AppUser WHERE role = 'user'").fetchall()
 
         if selected_category not in QUERY_CATEGORIES:
             selected_category = "全部类别"
