@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>校园二手交易平台数据库系统</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#dce9ff",
+                      "on-tertiary-container": "#ffd2be",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed-dim": "#c3c0ff",
+                      "on-error": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c7c4d8",
+                      "secondary-container": "#b6b4ff",
+                      "secondary": "#58579b",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container": "#e5eeff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-tint": "#4d44e3",
+                      "inverse-primary": "#c3c0ff",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "on-primary-fixed-variant": "#3323cc",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-primary-container": "#dad7ff",
+                      "primary-container": "#4f46e5",
+                      "error": "#ba1a1a",
+                      "on-secondary-container": "#454386",
+                      "surface-dim": "#cbdbf5",
+                      "secondary-fixed": "#e2dfff",
+                      "on-surface-variant": "#464555",
+                      "surface-variant": "#d3e4fe",
+                      "on-tertiary-fixed": "#351000",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-secondary-fixed-variant": "#413f82",
+                      "tertiary-fixed": "#ffdbcc",
+                      "primary-fixed": "#e2dfff",
+                      "outline": "#777587",
+                      "on-surface": "#0b1c30",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "surface-bright": "#f8f9ff",
+                      "inverse-surface": "#213145",
+                      "on-secondary-fixed": "#140f54",
+                      "on-primary-fixed": "#0f0069",
+                      "background": "#f8f9ff",
+                      "on-background": "#0b1c30",
+                      "on-tertiary": "#ffffff",
+                      "primary": "#3525cd",
+                      "surface": "#f8f9ff",
+                      "tertiary": "#7e3000",
+                      "tertiary-container": "#a44100"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Plus Jakarta Sans"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Accordion transition */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .collapsible-content.show {
+            max-height: 2000px;
+            transition: max-height 0.5s cubic-bezier(1, 0, 1, 0);
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.active {
+            transform: rotate(180deg);
+        }
+      </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopAppBar Shared Component -->
+<header class="fixed top-0 left-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0px_20px_40px_rgba(15,0,105,0.06)] h-20">
+<div class="flex items-center justify-between px-8 h-full w-full max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-indigo-700 dark:text-indigo-300">校园二手交易平台数据库系统</span>
+<nav class="hidden md:flex items-center space-x-6 font-['Plus_Jakarta_Sans'] tracking-tight text-sm font-medium">
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/">首页</a>
+<a class="text-indigo-700 dark:text-indigo-300 font-bold border-b-2 border-indigo-600 pb-1" href="/queries">查询与统计</a>
+{% if current_role == "user" %}
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/sell">上架商品</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/my/items">我的商品</a>
+{% endif %}
+{% if current_role == "admin" %}
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/manage/items">维护页</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/manage/users">用户管理</a>
+{% endif %}
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 pr-4 border-r border-outline-variant/20">
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface leading-none">{{ current_user_name }}</p>
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold">{{ current_role }}</p>
+</div>
+</div>
+<a href="/logout" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-500 hover:text-error transition-colors active:scale-95">
+<span class="material-symbols-outlined text-lg">logout</span>
+<span>退出登录</span>
+</a>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="pt-28 pb-20 px-4 md:px-8 max-w-screen-2xl mx-auto">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="w-full max-w-md mx-auto mb-8">
+            {% for message in messages %}
+            <div class="flash-message bg-primary-container text-on-primary-container px-4 py-3 rounded-lg shadow-lg mb-2 text-sm font-medium border border-primary/10">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+<!-- Page Header & Statistics Filter Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10">
+<div class="max-w-2xl">
+<span class="text-primary font-bold tracking-widest text-[10px] uppercase mb-2 block font-label">数据分析中心</span>
+<h1 class="text-5xl font-extrabold tracking-tight text-on-surface mb-4">市场洞察与查询</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed">分析校园市场的脉搏。通过我们整理的数据表格，深入了解交易历史、用户行为模式和库存流动。</p>
+</div>
+<!-- Filter Section -->
+<form action="/queries" method="GET" class="bg-surface-container-low p-6 rounded-lg shadow-sm border border-outline-variant/10 flex flex-wrap items-end gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">状态筛选</label>
+<select name="status" class="bg-surface-container-lowest border-none rounded-xl text-sm font-medium px-4 py-3 focus:ring-2 focus:ring-primary/20 min-w-[120px]">
+    <option value="全部" {% if selected_status == '全部' %}selected{% endif %}>全部</option>
+    <option value="在售" {% if selected_status == '在售' %}selected{% endif %}>仅在售</option>
+    <option value="已售" {% if selected_status == '已售' %}selected{% endif %}>仅已售</option>
+    <option value="已下架" {% if selected_status == '已下架' %}selected{% endif %}>仅下架</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">类别选择</label>
+<select name="category" class="bg-surface-container-lowest border-none rounded-xl text-sm font-medium px-4 py-3 focus:ring-2 focus:ring-primary/20 min-w-[150px]">
+    {% for category in query_categories %}
+    <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+    {% endfor %}
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">卖家筛选</label>
+<select name="seller_id" class="bg-surface-container-lowest border-none rounded-xl text-sm font-medium px-4 py-3 focus:ring-2 focus:ring-primary/20 min-w-[150px]">
+    <option value="" {% if not selected_seller_id %}selected{% endif %}>全部卖家</option>
+    {% for sid, sname in seller_options %}
+    <option value="{{ sid }}" {% if sid == selected_seller_id %}selected{% endif %}>{{ sname }} ({{ sid }})</option>
+    {% endfor %}
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">买家筛选</label>
+<select name="buyer_id" class="bg-surface-container-lowest border-none rounded-xl text-sm font-medium px-4 py-3 focus:ring-2 focus:ring-primary/20 min-w-[150px]">
+    <option value="" {% if not selected_buyer_id %}selected{% endif %}>全部买家</option>
+    {% for bid, bname in buyer_options %}
+    <option value="{{ bid }}" {% if bid == selected_buyer_id %}selected{% endif %}>{{ bname }} ({{ bid }})</option>
+    {% endfor %}
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">价格区间</label>
+<div class="flex items-center gap-2">
+    <input type="number" name="min_price" value="{{ min_price }}" placeholder="最低价" class="bg-surface-container-lowest border-none rounded-xl text-sm font-medium px-3 py-3 focus:ring-2 focus:ring-primary/20 w-24">
+    <span class="text-slate-400">-</span>
+    <input type="number" name="max_price" value="{{ max_price }}" placeholder="最高价" class="bg-surface-container-lowest border-none rounded-xl text-sm font-medium px-3 py-3 focus:ring-2 focus:ring-primary/20 w-24">
+</div>
+</div>
+<div class="flex items-end gap-3">
+    <button type="submit" class="bg-gradient-to-tr from-primary to-primary-container text-white px-8 py-3 rounded-full font-bold text-sm shadow-lg shadow-indigo-200 hover:scale-[1.02] active:scale-95 transition-all">
+        更新查询结果
+    </button>
+    <a href="/queries" class="bg-surface-container-highest text-on-surface-variant px-6 py-3 rounded-full font-bold text-sm hover:bg-outline-variant/20 active:scale-95 transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">restart_alt</span>
+        清除筛选
+    </a>
+</div>
+</form>
+</div>
+<!-- Data Display Area -->
+<div class="space-y-12">
+    <!-- Row 1: Aggregates (Overview & Ranking) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    {% for title, headers, rows in queries_data %}
+        {% if title in ["市场统计概况", "各类商品分布", "活跃卖家排行 (前三)"] %}
+        <div class="bg-surface-container-lowest rounded-lg shadow-[0px_20px_40px_rgba(15,0,105,0.06)] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-surface-container-low flex items-center justify-between">
+                <h2 class="text-lg font-bold text-on-surface">{{ title }}</h2>
+                <span class="material-symbols-outlined text-primary/40">
+                    {% if "统计" in title %}insights{% elif "分布" in title %}pie_chart{% else %}workspace_premium{% endif %}
+                </span>
+            </div>
+            <div class="p-6">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low">
+                            {% for h in headers %}
+                            <th onclick="sortTable(this)" class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors group/th">
+                                <div class="flex items-center gap-1">
+                                    <span>{{ h }}</span>
+                                    <span class="material-symbols-outlined text-[14px] opacity-0 group-hover/th:opacity-100 transition-opacity sort-icon">unfold_more</span>
+                                </div>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-surface-container-low">
+                        {% for r in rows %}
+                        <tr>
+                            {% for cell in r %}
+                            <td class="px-4 py-3 text-sm font-medium text-on-surface">{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+
+    <!-- Row 2: Dynamic Queries (Collapsible) -->
+    {% set query_titles = ["综合查询结果"] %}
+    {% for section_title in query_titles %}
+        {% set section_loop = loop %}
+        {% for title, headers, rows in queries_data %}
+            {% set query_loop = loop %}
+            {% if section_title in title %}
+            <div class="bg-surface-container-lowest rounded-lg shadow-[0px_20px_40px_rgba(15,0,105,0.06)] overflow-hidden flex flex-col w-full border border-outline-variant/5">
+                <!-- Accordion Header -->
+                <button onclick="toggleSection('section-{{ section_loop.index }}-{{ query_loop.index }}')" class="w-full p-8 flex items-center justify-between hover:bg-slate-50 transition-colors text-left group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">
+                                {% if "综合" in title or "主查询" in title %}analytics
+                                {% elif "卖家" in title %}storefront
+                                {% elif "买家" in title %}shopping_cart
+                                {% else %}receipt_long{% endif %}
+                            </span>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-on-surface">{{ title }}</h2>
+                            <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-black">点击展开/收纳明细表格</p>
+                        </div>
+                    </div>
+                    <span id="icon-section-{{ section_loop.index }}-{{ query_loop.index }}" class="material-symbols-outlined text-slate-300 rotate-icon active">expand_more</span>
+                </button>
+
+                <!-- Accordion Content -->
+                <div id="section-{{ section_loop.index }}-{{ query_loop.index }}" class="collapsible-content show">
+                    <div class="overflow-x-auto hide-scrollbar px-8 pb-8">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container-low">
+                                    {% for h in headers %}
+                                    <th onclick="sortTable(this)" class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors group/th">
+                                        <div class="flex items-center gap-1">
+                                            <span>{{ h }}</span>
+                                            <span class="material-symbols-outlined text-[14px] opacity-0 group-hover/th:opacity-100 transition-opacity sort-icon">unfold_more</span>
+                                        </div>
+                                    </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-container-low">
+                                {% for r in rows %}
+                                <tr class="hover:bg-surface-container-low/50 transition-colors group">
+                                    {% for cell in r %}
+                                    <td class="px-6 py-5 text-sm font-medium text-on-surface">{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="{{ headers|length }}" class="px-8 py-10 text-center text-slate-400 text-sm italic">暂无相关数据</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<footer class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-end pb-6 px-4 bg-white/90 backdrop-blur-lg rounded-t-[2rem] z-50 shadow-2xl">
+<a class="flex flex-col items-center justify-center text-slate-400 p-2 hover:text-indigo-500 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-indigo-600 text-white rounded-full w-14 h-14 -mt-8 shadow-lg shadow-indigo-200 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="hidden">Sell</span>
+</a>
+<a class="flex flex-col items-center justify-center text-indigo-600 p-2 hover:text-indigo-500 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 p-2 hover:text-indigo-500 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Account</span>
+</a>
+</footer>
+<script>
+    function toggleSection(id) {
+        const content = document.getElementById(id);
+        const icon = document.getElementById('icon-' + id);
+        content.classList.toggle('show');
+        icon.classList.toggle('active');
+    }
+
+    function sortTable(header) {
+        const table = header.closest('table');
+        const colIndex = header.cellIndex;
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const isAsc = header.dataset.order !== 'asc';
+        
+        // Reset other headers in the same table
+        header.parentElement.querySelectorAll('th').forEach(th => {
+            if (th !== header) {
+                th.dataset.order = '';
+                const icon = th.querySelector('.sort-icon');
+                if (icon) {
+                    icon.textContent = 'unfold_more';
+                    icon.classList.add('opacity-0');
+                    icon.classList.remove('opacity-100', 'text-primary');
+                }
+            }
+        });
+
+        // Update current header
+        header.dataset.order = isAsc ? 'asc' : 'desc';
+        const currentIcon = header.querySelector('.sort-icon');
+        currentIcon.textContent = isAsc ? 'expand_less' : 'expand_more';
+        currentIcon.classList.remove('opacity-0');
+        currentIcon.classList.add('opacity-100', 'text-primary');
+
+        const sortedRows = rows.sort((a, b) => {
+            let valA = a.cells[colIndex].textContent.trim();
+            let valB = b.cells[colIndex].textContent.trim();
+            
+            // Handle currency and numbers
+            if (valA.startsWith('¥')) valA = valA.substring(1);
+            if (valB.startsWith('¥')) valB = valB.substring(1);
+            
+            const numA = parseFloat(valA);
+            const numB = parseFloat(valB);
+            
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return isAsc ? numA - numB : numB - numA;
+            }
+            
+            return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+
+        tbody.innerHTML = '';
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Flash messages auto-hide
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.flash-message');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 1s ease-out';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 1000);
+        });
+    }, 5000);
+</script>
+</body></html>

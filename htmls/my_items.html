@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>校园二手交易平台数据库系统</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+        }
+        h1, h2, h3, .headline {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#dce9ff",
+                      "on-tertiary-container": "#ffd2be",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed-dim": "#c3c0ff",
+                      "on-error": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c7c4d8",
+                      "secondary-container": "#b6b4ff",
+                      "secondary": "#58579b",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container": "#e5eeff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-tint": "#4d44e3",
+                      "inverse-primary": "#c3c0ff",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "on-primary-fixed-variant": "#3323cc",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-primary-container": "#dad7ff",
+                      "primary-container": "#4f46e5",
+                      "error": "#ba1a1a",
+                      "on-secondary-container": "#454386",
+                      "surface-dim": "#cbdbf5",
+                      "secondary-fixed": "#e2dfff",
+                      "on-surface-variant": "#464555",
+                      "surface-variant": "#d3e4fe",
+                      "on-tertiary-fixed": "#351000",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-secondary-fixed-variant": "#413f82",
+                      "tertiary-fixed": "#ffdbcc",
+                      "primary-fixed": "#e2dfff",
+                      "outline": "#777587",
+                      "on-surface": "#0b1c30",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "surface-bright": "#f8f9ff",
+                      "inverse-surface": "#213145",
+                      "on-secondary-fixed": "#140f54",
+                      "on-primary-fixed": "#0f0069",
+                      "background": "#f8f9ff",
+                      "on-background": "#0b1c30",
+                      "on-tertiary": "#ffffff",
+                      "primary": "#3525cd",
+                      "surface": "#f8f9ff",
+                      "tertiary": "#7e3000",
+                      "tertiary-container": "#a44100"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Plus Jakarta Sans"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          }
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopAppBar Shared Component -->
+<header class="fixed top-0 left-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0px_20px_40px_rgba(15,0,105,0.06)] h-20">
+<div class="flex items-center justify-between px-8 h-full w-full max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-indigo-700 dark:text-indigo-300">校园二手交易平台数据库系统</span>
+<nav class="hidden md:flex items-center space-x-6 font-['Plus_Jakarta_Sans'] tracking-tight text-sm font-medium">
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/">首页</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/queries">查询与统计</a>
+{% if current_role == "user" %}
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/sell">上架商品</a>
+<a class="text-indigo-700 dark:text-indigo-300 font-bold border-b-2 border-indigo-600 pb-1" href="/my/items">我的商品</a>
+{% endif %}
+{% if current_role == "admin" %}
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/manage/items">维护页</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors" href="/manage/users">用户管理</a>
+{% endif %}
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 pr-4 border-r border-outline-variant/20">
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface leading-none">{{ current_user_name }}</p>
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold">{{ current_role }}</p>
+</div>
+</div>
+<a href="/logout" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-500 hover:text-error transition-colors active:scale-95">
+<span class="material-symbols-outlined text-lg">logout</span>
+<span>退出登录</span>
+</a>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-20 px-8 max-w-screen-2xl mx-auto">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="w-full max-w-md mx-auto mb-8">
+            {% for message in messages %}
+            <div class="flash-message bg-primary-container text-on-primary-container px-4 py-3 rounded-lg shadow-lg mb-2 text-sm font-medium border border-primary/10">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+<!-- Header Section -->
+<section class="mb-12">
+<div class="flex justify-between items-end">
+<div class="max-w-2xl">
+<h1 class="text-5xl font-extrabold tracking-tight text-on-surface mb-4">我的商品管理</h1>
+<p class="text-body-lg text-on-surface-variant leading-relaxed opacity-80">
+                    在这里管理您发布的所有商品。您可以随时更新商品价格，或者查看商品的当前销售状态。
+                </p>
+</div>
+</div>
+</section>
+
+<!-- My Items Table -->
+<section class="space-y-8">
+    <!-- Active Items (On Sale & Taken Down) -->
+    <div class="bg-surface-container-lowest rounded-lg shadow-[0px_20px_40px_rgba(15,0,105,0.04)] overflow-hidden">
+        <div class="p-6 border-b border-slate-50 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-on-surface">在售与下架商品</h2>
+            <span class="px-3 py-1 bg-primary/10 text-[10px] font-black text-primary rounded-full uppercase tracking-widest">库存管理</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low border-none">
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">ID</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">商品名称</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">分类</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">价格管理</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">状态</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60 text-right">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                {% for item in managed_items if item[4] != 1 %}
+                <tr class="group hover:bg-surface-container-low/50 transition-colors">
+                    <td class="px-8 py-6 text-sm font-medium text-slate-400">#{{ item[0] }}</td>
+                    <td class="px-8 py-6">
+                        <p class="text-sm font-bold text-on-surface">{{ item[1] }}</p>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="px-3 py-1 bg-surface-container text-[10px] font-bold text-indigo-700 rounded-full uppercase tracking-wider">{{ item[2] }}</span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <form action="/my/items/update-price/{{ item[0] }}" method="POST" class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-slate-400">¥</span>
+                            <input name="price" class="w-20 px-2 py-1 bg-surface-container-highest border-none rounded-lg text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary/30 transition-all" type="number" step="1" value="{{ item[3] }}" {% if item[4] == 1 %}disabled{% endif %}/>
+                            <button type="submit" class="p-1.5 bg-primary text-on-primary rounded-lg hover:bg-primary-container transition-colors active:scale-95 disabled:opacity-50" {% if item[4] == 1 %}disabled{% endif %}>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </button>
+                        </form>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full {% if item[4] == 0 %}bg-emerald-500{% elif item[4] == 2 %}bg-amber-500{% else %}bg-slate-300{% endif %}"></span>
+                            <span class="text-xs font-semibold {% if item[4] == 0 %}text-emerald-600{% elif item[4] == 2 %}text-amber-600{% else %}text-slate-500{% endif %}">
+                                {% if item[4] == 0 %}在售{% elif item[4] == 1 %}已售{% elif item[4] == 2 %}已下架{% endif %}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-right">
+                        {% if item[4] == 0 %}
+                        <form action="/my/items/take-down/{{ item[0] }}" method="POST" class="inline">
+                            <button type="submit" class="text-xs font-bold text-amber-600 hover:text-amber-800 transition-colors uppercase tracking-widest">下架</button>
+                        </form>
+                        {% elif item[4] == 2 %}
+                        <form action="/my/items/re-list/{{ item[0] }}" method="POST" class="inline">
+                            <button type="submit" class="text-xs font-bold text-emerald-600 hover:text-emerald-800 transition-colors uppercase tracking-widest">重新上架</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sold Items (Separate Table) -->
+    <div class="bg-surface-container-lowest rounded-lg shadow-[0px_20px_40px_rgba(15,0,105,0.04)] overflow-hidden">
+        <div class="p-6 border-b border-slate-50 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-on-surface opacity-60">已售出商品</h2>
+            <span class="px-3 py-1 bg-slate-100 text-[10px] font-black text-slate-400 rounded-full uppercase tracking-widest">销售历史</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low border-none">
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">ID</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">商品名称</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">分类</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">成交价格</th>
+                        <th class="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-on-surface-variant opacity-60">状态</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                {% for item in managed_items if item[4] == 1 %}
+                <tr class="group opacity-70 grayscale-[0.5] hover:grayscale-0 transition-all">
+                    <td class="px-8 py-6 text-sm font-medium text-slate-400">#{{ item[0] }}</td>
+                    <td class="px-8 py-6">
+                        <p class="text-sm font-bold text-on-surface">{{ item[1] }}</p>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="px-3 py-1 bg-surface-container text-[10px] font-bold text-slate-500 rounded-full uppercase tracking-wider">{{ item[2] }}</span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="text-sm font-bold text-on-surface">¥{{ item[3] }}</span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                            <span class="text-xs font-semibold text-slate-500">已售出</span>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-8 py-10 text-center text-slate-400 text-sm italic">暂无已售出的商品</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</main>
+    <script>
+        // Flash messages auto-hide
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.flash-message');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 1s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 1000);
+            });
+        }, 5000);
+    </script>
+</body></html>
