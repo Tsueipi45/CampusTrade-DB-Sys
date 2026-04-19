@@ -53,8 +53,10 @@ class CursorProxy:
             # 处理 SQLite 的 || 字符串拼接（PostgreSQL 也支持，但有时会有类型问题，不过这里应该还好）
         
         if params:
-            return self.cursor.execute(sql, params)
-        return self.cursor.execute(sql)
+            self.cursor.execute(sql, params)
+        else:
+            self.cursor.execute(sql)
+        return self
 
     def fetchone(self):
         return self.cursor.fetchone()
